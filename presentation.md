@@ -1,11 +1,5 @@
-## How Grindr Does Continuous Deployment
-
-Ben Brodie
-Justin Standard
-Nicolas Mosconi
-Rafał Studnicki
-Robert Tibljas
-Valentin Traverso
+## How Grindr Does:
+### Continuous Deployment
 
 ---
 
@@ -18,7 +12,7 @@ Check out a branch
 
 ---
 
-At a specified time
+At a recurring time
 ![](scheduler.png)
 
 ---
@@ -49,10 +43,10 @@ By creating our continuous deployment out of small composable units, we get port
 
 ### Tasks
 
-1. Tests <!-- .element: class="fragment" data-fragment-index="1" -->
-2. Deployment Tests <!-- .element: class="fragment" data-fragment-index="2" -->
-3. Build the artifact <!-- .element: class="fragment" data-fragment-index="3" -->
-4. Deploy the artifact <!-- .element: class="fragment" data-fragment-index="4" -->
+1. Tests <!-- .element: class="fragment" -->
+2. Deployment Tests <!-- .element: class="fragment" -->
+3. Build the artifact <!-- .element: class="fragment" -->
+4. Deploy the artifact <!-- .element: class="fragment" -->
 
 note: 
 1. Unit Tests / Regression Test / All of your tests
@@ -89,6 +83,17 @@ note:
 4. Glue that holds together shell scripts.
 
 ---
+
+### Tasks
+
+1. Tests <!-- .element: class="fragment highlight-blue" -->
+2. Deployment Tests
+3. Build the artifact
+4. Deploy the artifact
+
+
+---
+
 
 ### Tests
 
@@ -173,6 +178,16 @@ note:
 Alright, so lets run the tests.
 
 So, we have the test _and_ we have a mysql dependency that we can start with `make`.
+
+---
+
+
+### Tasks
+
+1. ~~Tests~~
+2. Deployment Tests <!-- .element: class="fragment highlight-blue" -->
+3. Build the artifact
+4. Deploy the artifact
 
 ---
 
@@ -755,10 +770,30 @@ defp versions do
 end
 </code></pre>
 
-notes:
+
+note:
 It turns out we already can do everything. 
 
---- 
+
+---
+
+
+### Tasks
+
+1. ~~Tests~~
+2. ~~Deployment Tests~~
+3. ~~Build the artifact~~ <!-- .element class="fragment" -->
+4. ~~Deploy the artifact~~ <!-- .element class="fragment" -->
+
+
+note:
+We already solved for building the artifact.
+And we already solved for deploying the artifact.
+
+Isn't TDD nice?
+
+
+---
 
 
 We are done.

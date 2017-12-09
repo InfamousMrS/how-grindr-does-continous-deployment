@@ -1,6 +1,6 @@
 setup:
 	npm install
 
-run:
+present:
 	npm start
 	open http://localhost:8000

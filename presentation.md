@@ -24,17 +24,20 @@ It doesn't matter what build tool this is. It could be done just be a cron job.
 
 ---
 
-Why do continuous deployment?
-  * Keeps the deployment process working continuously without surprises.
-  * Deploy often with less overhead.
-  * Keeps deployments small. 
+### Why
+
+1. Keeps the deployment process working continuously without surprises.
+2. Deploy often with less overhead.
+3. Keeps deployments small. 
 
 note:
 There are a lot of reasons, but I will focus on just a few. 
 
 ---
 
-Why does engineering stop after code is written? Getting code to production is part of the job, and continuous deployment _just is_ the automation of deployment.
+Why does engineering stop after code is written? 
+
+Getting code to production is part of the job, and continuous deployment _just is_ the automation of deployment.
 
 
 ---
@@ -138,12 +141,10 @@ You can give default values to variables in the makefile as well.
 
 ---
 
-
 ### Tests
 
 As an engineer, tests should be a prerequisite to almost everything you do.
 A test is a prerequisite to writing code.
-
 
 ---
 
@@ -151,7 +152,6 @@ A test is a prerequisite to writing code.
 test: 
 	mix test $$file
 ``` 
-<!-- .element: class="fragment" data-fragment-index="1" -->
 
 ```shell
 make test [file=test/sometest.exs]
@@ -161,9 +161,7 @@ make test [file=test/sometest.exs]
 note: 
 But what if our tests reguire MySQL to be running. We have integration tests that do test the data layer.
 
-
 ---
-
 
 ```makefile
 mysql-test:
@@ -328,7 +326,7 @@ We use amazonlinux in our preproduction and production environment.
 
 ---
 
-(Remember I said install anywhere?) 
+(Remember I said deploy anywhere?) 
 
 This will only produce an artifact compatible with amazonlinux:2017.03.
 
@@ -374,13 +372,14 @@ CMD /etc/init.d/sshd start && tail /dev/null -f
 
 ---
 
+```makefile
 run-profile-service-container-2: \
  build-profile-service-image mysql
 	-docker rm -f profile_service.2
 	docker run -d --name profile_service.2 \
 	--link profiles_mysql:mysql-server \
 	-p 2022:22 -p 24000:4001 -p 29000:9001 profile-service
-</code></pre>
+```
 
 note:
 Lets look back on one of these tasks. 
@@ -432,7 +431,7 @@ note:
 ---
 
 
-<pre class="fragment" data-fragment-index="4"><code class="makefile" data-trim data-noescape>
+<pre><code class="makefile" data-trim data-noescape>
 check-vars:
 ifndef commit_ref
 	$(error commit_ref is undefined)
@@ -651,7 +650,7 @@ What is ansible?
 <div class="fragment">
 It doesn't really matter what it is. 
 
-It is just a set of tools that help you set up a machine and upload an artifact. Some people like using it.
+It is a set of tools that help you set up a machine and upload an artifact. Some people like using it.
 
 You could simply use `scp`, `ssh` and `bash`. 
 </div>
@@ -726,7 +725,7 @@ Here are some of the tasks.
 
 ---
 
-<pre class="fragment"><code class="elixir" data-trim data-noescape>
+<pre><code class="elixir" data-trim data-noescape>
 test "Can deploy an instance" do
   start_containers()
   build_target_release("0.1.1")
@@ -799,7 +798,7 @@ We are done.
 
 We have continuous delivery composed of tasks.
 
-`make` can be run anywhere, from your laptop, a cron job, jenkins, and the next new thing
+`make` can be run anywhere, from your laptop, a cron job, jenkins, and the next new thing.
 
 As a result, we can deploy _from_ anywhere, _to_ anywhere.
 

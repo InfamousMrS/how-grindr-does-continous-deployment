@@ -1,5 +1,4 @@
-## How Grindr Does:
-### Continuous Deployment
+![](elixir-la-grindr-dec17.png)
 
 ---
 
@@ -21,9 +20,33 @@ And deploy it to production
 ![](execute_shell.png)
 
 note: 
-It doesn't matter what build tool this is. It could be done from a cron job just as easily.
+It doesn't matter what build tool this is. It could be done just be a cron job.
 
 ---
+
+Why do continuous deployment?
+  * Keeps the deployment process working continuously without surprises.
+  * Deploy often with less overhead.
+  * Keeps deployments small. 
+
+note:
+There are a lot of reasons, but I will focus on just a few. 
+
+---
+
+Why does engineering stop after code is written? Getting code to production is part of the job, and continuous deployment _just is_ the automation of deployment.
+
+
+---
+
+### Composition
+
+
+By creating our continuous deployment out of small composable units, we get portability and independence of tasks.
+
+
+---
+
 
 ### Goals
 
@@ -32,12 +55,9 @@ It doesn't matter what build tool this is. It could be done from a cron job just
   <li class="fragment"> Deploy _from_ anywhere </li>
 </ol>
 
----
+note:
+We decided if we could deploy to anywhere and from anywhere, then everything else would fall into place. 
 
-### Composition
-
-
-By creating our continuous deployment out of small composable units, we get portability and independence of tasks.
 
 ---
 
@@ -49,15 +69,26 @@ By creating our continuous deployment out of small composable units, we get port
 4. Deploy the artifact <!-- .element: class="fragment" -->
 
 note: 
-1. Unit Tests / Regression Test / All of your tests
+1. We practice test driven development. We have unit tests integration tests.
 2. We also need to include tests that our deployment works.
 3. We need to build the thing being deployed
 4. We need to actually deploy it
 
 
-What is great for running a series of tasks that may or may not be dependent on each other?
 
 ---
+
+
+What is great for running a series of tasks that may or may not be dependent on each other?
+
+note:
+1. Anybody have any ideas?
+2. Show of hands - Who has written a Makefile?
+3. Who uses make on a daily basis?
+
+
+---
+
 
 Makefile Refresher
 
@@ -77,10 +108,23 @@ say:
 ```
 
 note:
+4. Glue that holds together shell scripts.
 1. Dependency tree
 2. .PHONY just means that the task is not the name of a file
 3. Make will check if the timestamp of your dependencies is older than the timestamp of the current file
-4. Glue that holds together shell scripts.
+
+---
+
+
+```makefile
+db_user=local_user
+db_password=local_password
+db_database=grindr
+db_hostname=localhost
+```
+
+note:
+You can give default values to variables in the makefile as well.
 
 ---
 
@@ -97,6 +141,12 @@ note:
 
 ### Tests
 
+As an engineer, tests should be a prerequisite to almost everything you do.
+A test is a prerequisite to writing code.
+
+
+---
+
 ```makefile
 test: 
 	mix test $$file
@@ -109,9 +159,11 @@ make test [file=test/sometest.exs]
 <!-- .element: class="fragment" data-fragment-index="2" -->
 
 note: 
-Some of our large tests require mysql database to be running.
+But what if our tests reguire MySQL to be running. We have integration tests that do test the data layer.
+
 
 ---
+
 
 ```makefile
 mysql-test:
@@ -122,17 +174,11 @@ test: mysql-test
 ```
 
 note:
-Whats this $(MAKE) mysql syntax here?
-Let's take a look.
+1. This $(MAKE) just runs make.
+2. Lets look at the Makefile in the docker directory.
 
 ---
 
-```makefile
-db_user=local_user
-db_password=local_password
-db_database=grindr
-db_hostname=localhost
-```
 
 ```makefile
 mysql: mysql-docker
@@ -153,13 +199,6 @@ Lets take a look.
 ---
 
 ```makefile
-db_user=local_user
-db_password=local_password
-db_database=grindr
-db_hostname=localhost
-```
-
-```makefile
 mysql-docker:
 	docker ps  | grep profiles_mysql; \
 	if [ "$$?" != "0" ];  then \
@@ -175,9 +214,8 @@ mysql-docker:
 ```
 
 note: 
-Alright, so lets run the tests.
-
 So, we have the test _and_ we have a mysql dependency that we can start with `make`.
+
 
 ---
 
@@ -195,13 +233,12 @@ Now that our application passes tests, we want to deploy.
 
 ---
 
-Make automated deployment a prerequisite to production for new projects.
+
+1. Require automated deployment as a prerequisite to production for new projects.
+2. Write your tests first, _for everything_. This means write your tests for deployment before you have deployment.
 
 ---
 
-Write your tests first, _for everything_. This means write your tests for deployment before you have deployment.
-
----
 
 Simple. 
 
@@ -219,11 +256,8 @@ end
 </code></pre>
 
 note:
-Our first deployment test.
-Let's look at start_containers function
-
-note:
-We just choose an arbitrary version for this test.
+Here is our first deployment test. Note that the version is arbitrary here.
+Let's look at the start_containers function.
 
 ---
 
@@ -236,7 +270,7 @@ We just choose an arbitrary version for this test.
 ```
 
 note: 
-Oh, its calling the makefile in docker/
+This test is calling the Makefile in the docker directory and asserting that it returns successfully.
 
 ---
 
@@ -248,14 +282,14 @@ run-profiles-service-containers: \
 
 <pre class="fragment" data-fragment-index="1"><code class="makefile" data-trim data-noescape>
 run-profile-service-container-1: \
- <span class="fragment highlight-current-blue" data-fragment-index="3">build-profile-service-image</span> mysql
+ <span class="fragment highlight-current-blue" data-fragment-index="2">build-profile-service-image</span> mysql
 	-docker rm -f profile_service.1
 	docker run -d --name profile_service.1 \
 	--link profiles_mysql:mysql-server \
 	-p 1022:22 -p 14000:4001 -p 19000:9001 profile-service
 
 run-profile-service-container-2: \
- <span class="fragment highlight-current-blue" data-fragment-index="3">build-profile-service-image</span> mysql
+ <span class="fragment highlight-current-blue" data-fragment-index="2">build-profile-service-image</span> mysql
 	-docker rm -f profile_service.2
 	docker run -d --name profile_service.2 \
 	--link profiles_mysql:mysql-server \
@@ -263,15 +297,18 @@ run-profile-service-container-2: \
 </code></pre>
 
 
-<pre class="fragment" data-fragment-index="4"><code class="makefile" data-trim data-noescape>
+---
+
+<pre><code class="makefile" data-trim data-noescape>
 build-profile-service-image: \
- <span class="fragment highlight-current-blue" data-fragment-index="5">generate-container-keypair</span>
+ <span class="fragment highlight-current-blue">generate-container-keypair</span>
 	docker build \
     -t profile-service \
-    -f <span class="fragment highlight-current-blue" data-fragment-index="7">profile-service.dockerfile</span> ..
+    -f <span class="fragment highlight-current-blue">profile-service.dockerfile</span> ..
 </pre></code>
 
-<pre class="fragment" data-fragment-index="6"><code class="makefile" data-trim data-noescape>
+
+<pre><code class="makefile" data-trim data-noescape>
 generate-container-keypair:
 	rm -rf ../ansible/deployment_test_key*
 	ssh-keygen -t rsa \
@@ -285,6 +322,9 @@ FROM amazonlinux:2017.03
 
 LABEL maintainer="Chat Team <chat@grindr.com>"
 ```
+
+note:
+We use amazonlinux in our preproduction and production environment.
 
 ---
 
@@ -334,18 +374,6 @@ CMD /etc/init.d/sshd start && tail /dev/null -f
 
 ---
 
-<pre><code class="makefile" data-trim data-noescape>
-run-profiles-service-containers: \
- run-profile-service-container-1 \
- run-profile-service-container-2
-
-run-profile-service-container-1: \
- build-profile-service-image mysql
-	-docker rm -f profile_service.1
-	docker run -d --name profile_service.1 \
-	--link profiles_mysql:mysql-server \
-	-p 1022:22 -p 14000:4001 -p 19000:9001 profile-service
-
 run-profile-service-container-2: \
  build-profile-service-image mysql
 	-docker rm -f profile_service.2
@@ -355,10 +383,12 @@ run-profile-service-container-2: \
 </code></pre>
 
 note:
-So, now we have the containers running and they have ssh on them.
-Can you guess what comes next?
+Lets look back on one of these tasks. 
+We are running the container so that we can ssh into it to deploy an artifact.
+
 
 ---
+
 
 <pre><code class="elixir" data-trim data-noescape>
 test "Can deploy an instance" do
@@ -367,6 +397,7 @@ test "Can deploy an instance" do
   deploy_to_containers("0.1.1", ["node-1", "node-2"])
 end
 </code></pre>
+
 
 ---
 
@@ -393,6 +424,14 @@ target-release: check-vars docker-build
 		amazonlinux-erl-iex:19.3-14.4.4
 </code></pre>
 
+note:
+1. We want to generate the artifact, which depends on target-release.
+2. target-release builds the release in a docker container. You will see the build in the dockerfile itself.
+3. It is dependent on check-vars and docker-build
+
+---
+
+
 <pre class="fragment" data-fragment-index="4"><code class="makefile" data-trim data-noescape>
 check-vars:
 ifndef commit_ref
@@ -405,6 +444,10 @@ docker-build: checkout-version
 	docker build -t amazonlinux-erl-iex:19.3-14.4.4 \
     -f Dockerfile .
 </code></pre>
+
+note:
+1. Check vars just throws an error if commit_ref is undefined.
+2. docker-build builds the docker image (but does not run it)
 
 ---
 
@@ -423,39 +466,13 @@ checkout-version: _deploy/profile-service
 	git fetch && \
 	git checkout $(commit_ref) && \
 	make deps
+
 ```
 
 note: 
-We are cloning the repo into _deploy directory
+1. Here we are actually cloning our current, local git repository into a directory that is accessible to docker, so that the docker image can build it. 
+2. We call make deps first so that we can pull dependencies that are in a private git repo.
 
----
-
-<pre><code class="makefile" data-trim data-noescape>
-profile_service.tar.gz: target-release
-	rm -f profile_service.tar.gz
-	mv _deploy/profile_service.tar.gz .
-</code></pre>
-
-<pre><code class="makefile" data-trim data-noescape>
-target-release: check-vars docker-build
-	-docker rm -f amazonlinux-build-box
-	docker run --name amazonlinux-build-box \
-		-v $$(pwd)/_deploy:/root/_deploy \
-		amazonlinux-erl-iex:19.3-14.4.4
-</code></pre>
-
-<pre><code class="makefile" data-trim data-noescape>
-check-vars:
-ifndef commit_ref
-	$(error commit_ref is undefined)
-endif
-</code></pre>
-
-<pre><code class="makefile" data-trim data-noescape>
-docker-build: checkout-version
-	docker build -t amazonlinux-erl-iex:19.3-14.4.4 \
-    -f <span class="fragment highlight-current-blue">Dockerfile</span> .
-</code></pre>
 
 ---
 
@@ -466,8 +483,11 @@ LABEL maintainer="Chat Team <chat@grindr.com>"
 
 WORKDIR /root
 
-RUN yum install -y sed which openssl unzip wget
+RUN yum install -y sed which openssl unzip wget git
 ```
+
+note:
+Again, we use amazonlinux and we install some dependencies we will need.
 
 ---
 
@@ -481,7 +501,7 @@ RUN wget https://github.com/elixir-lang/elixir/releases/download/v1.4.4/Precompi
 ```
 
 note:
-We need to actually have erlang / elixir running on these docker images, vs those where we just run the build.
+We need to actually have erlang / elixir running on these docker images, so we need to install these.
 
 ---
 
@@ -489,23 +509,28 @@ We need to actually have erlang / elixir running on these docker images, vs thos
 VOLUME /root/_deploy
 ```
 
+note:
+We mount the directory that the cloned repository is in.
+
+
 ---
 
 ```dockerfile
 
-RUN yum install -y git
- 
 ENV PATH="/opt/elixir/1.4.4/bin:${PATH}"
 ENV LC_ALL="en_US.UTF-8"
 
 CMD cd /root/_deploy/profile-service && rm -rf _build && \
     make setup && make rel && \
-  cp _build/prod/rel/profile_service/releases/`git describe --always --tags`/profile_service.tar.gz ../ && \
+  cp _build/prod/rel/profile_service/releases/\
+  `git describe --always --tags`/profile_service.tar.gz ../ && \
   cd /root && chmod -R a+rw *
 ```
 
+
 note:
-Why are we doing that weird thing with git?
+1. This is the part that runs when we do `docker run`.
+2. Notice this git command here.
 
 ---
 
@@ -538,13 +563,10 @@ end
 0.1.1-39-g2864ed4
 ```
 
----
+note:
+This is how we version the project. Automated versions.
 
-<pre><code class="makefile" data-trim data-noescape>
-profile_service.tar.gz: target-release
-	rm -f profile_service.tar.gz
-	mv _deploy/profile_service.tar.gz .
-</code></pre>
+---
 
 <pre><code class="makefile" data-trim data-noescape>
 target-release: check-vars docker-build
@@ -554,18 +576,8 @@ target-release: check-vars docker-build
 		amazonlinux-erl-iex:19.3-14.4.4
 </code></pre>
 
-<pre><code class="makefile" data-trim data-noescape>
-check-vars:
-ifndef commit_ref
-	$(error commit_ref is undefined)
-endif
-</code></pre>
-
-<pre><code class="makefile" data-trim data-noescape>
-docker-build: checkout-version
-	docker build -t amazonlinux-erl-iex:19.3-14.4.4 \
-    -f Dockerfile .
-</code></pre>
+note:
+Lets take a quick look back at target-release. This is where we run the docker image which builds the artifact.
 
 ---
 
@@ -588,8 +600,9 @@ end
 </code></pre>
 
 note:
-What is wrong here?
-We aren't using `nodes`. There is actually a TODO in the real code.
+This time we use a make deploy task in our ansible directory, and pass it two arguments.
+1. The test inventory.
+2. The database hostname.
 
 ---
 
@@ -627,6 +640,10 @@ ifndef commit_ref
 endif
 ```
 
+note:
+1. Show of hands - Who has used ansible?
+2. Who uses ansible on a daily basis?
+
 ---
 
 What is ansible?
@@ -634,10 +651,11 @@ What is ansible?
 <div class="fragment">
 It doesn't really matter what it is. 
 
-It is just a set of tools that help you set up a machine and upload an artifact.
+It is just a set of tools that help you set up a machine and upload an artifact. Some people like using it.
 
 You could simply use `scp`, `ssh` and `bash`. 
 </div>
+
 
 ---
 
@@ -660,36 +678,13 @@ ansible_user=ec2-user
 ansible_ssh_private_key_file=deployment_test_key
 </code></pre>
 
----
-
-<pre><code class="makefile" data-trim data-noescape>
-run-profile-service-container-1: build-profile-service-image mysql
-	-docker rm -f profile_service.1
-	docker run -d --name <span class="fragment highlight-blue" data-fragment-index="1">profile_service.1</span> \
-	--link profiles_mysql:mysql-server \
-	<span class="fragment highlight-blue" data-fragment-index="1">-p 1022:22 -p 14000:4001 -p 19000:9001 profile-service</span>
-
-run-profile-service-container-2: build-profile-service-image mysql
-	-docker rm -f profile_service.2
-	docker run -d --name <span class="fragment highlight-blue" data-fragment-index="1">profile_service.2</span> \
-	--link profiles_mysql:mysql-server \
-	<span class="fragment highlight-blue" data-fragment-index="1">-p 2022:22 -p 24000:4001 -p 29000:9001 profile-service</span>
-    </code></pre>
-
-<pre><code class="makefile" data-trim data-noescape>
-generate-container-keypair:
-	rm -rf ../ansible/deployment_test_key*
-	ssh-keygen -t rsa -f <span class="fragment highlight-blue" data-fragment-index="2">../ansible/deployment_test_key -N "" -q</span>
-</code></pre>
-
 note:
-
-Remember this? Ah, yeah, now it make sense?
+Remember that key we generated? Here is where it comes into play. This is the key that ansible will use to SSH into those instances.
 
 ---
 
 ```shell
-ansible-playbook -i inventory_file -e ENV_VAR_1 -e ENV_VAR_2
+ansible-playbook some-playbook.yml -i inventory_file -e ENV_VAR_1 -e ENV_VAR_2 
 ```
 
 ---
@@ -727,7 +722,7 @@ ansible-playbook -i inventory_file -e ENV_VAR_1 -e ENV_VAR_2
 
 note: 
 A playbook is just a yaml file with instructions.
-It has tasks such as ...
+Here are some of the tasks.
 
 ---
 
@@ -738,6 +733,10 @@ test "Can deploy an instance" do
   deploy_to_containers("0.1.1", ["node-1", "node-2"])
 end
 </code></pre>
+
+note:
+We are done with this test. Lets test that our current version is actually deployable.
+
 
 ---
 
@@ -772,7 +771,7 @@ end
 
 
 note:
-It turns out we already can do everything. 
+It turns out we already can do everything. Take a look and let me know if you have questions.
 
 
 ---

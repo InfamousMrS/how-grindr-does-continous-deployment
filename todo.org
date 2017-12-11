@@ -1,0 +1,19 @@
+** DONE Set the landscape.
+   CLOSED: [2017-12-10 Sun 11:30]
+Why do we want to do continuous deployment.
+
+
+** DONE Before Test slide
+   CLOSED: [2017-12-10 Sun 12:10]
+For new code make tests. TDD is a prerequisite to everything.
+
+** Show the github component
+
+** DONE Add more notes so you know what the slide shows
+   CLOSED: [2017-12-10 Sun 19:00]
+
+** DONE Don't go back.
+   CLOSED: [2017-12-10 Sun 19:00]
+
+** DONE Engineers forget about deployment
+   CLOSED: [2017-12-10 Sun 12:11]

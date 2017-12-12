@@ -99,6 +99,9 @@ Makefile Refresher
 ```makefile
 .PHONY cat_hello_world 
 
+target: source
+    command
+
 hello_world:
     echo "hello world" >> hello_world
 
@@ -826,4 +829,16 @@ You, too, can build your own continuous delivery pipeline,
 and some may be borrowed from what you saw today, and other parts will be different to suit your needs.
 
 Don't wait for someone else to build it or it will never happen. Nobody else can build what _you_ need.
+
+---
+
+Thanks to the great engineers that contributed.
+
+Nicolas Mosconi
+Robert Tibljas
+Valentin Traverso
+Justin Standard
+Rafal Studnicki
+Simon Zelazny
+
 

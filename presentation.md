@@ -334,9 +334,9 @@ We use amazonlinux in our preproduction and production environment.
 
 (Remember I said deploy anywhere?) 
 
-This will only produce an artifact compatible with amazonlinux:2017.03.
-
-But, because it is composable, we can always add more dockerfiles _when we need to_.
+note:
+1. This will only produce an artifact compatible with amazonlinux:2017.03.
+2. But, because it is composable, we can always add more dockerfiles _when we need to_.
 
 ---
 
@@ -653,13 +653,13 @@ note:
 
 What is ansible?
 
-<div class="fragment">
-It doesn't really matter what it is. 
+If you don't know what it is, just use `scp`, `ssh` and `bash` for your first attempt.
 
-It is a set of tools that help you set up a machine and upload an artifact. Some people like using it.
-
-You could simply use `scp`, `ssh` and `bash`. 
-</div>
+note:
+1. It doesn't really matter what it is. 
+2. It is a set of tools that help you set up a machine and upload an artifact. 
+4. Some people like using it.
+3. You could simply use `scp`, `ssh` and `bash`. 
 
 
 ---
@@ -802,16 +802,12 @@ Isn't TDD nice?
 
 We are done.
 
-We have continuous delivery composed of tasks.
+<ol>
+  <li class="fragment">We have continuous delivery composed of tasks. </li>
+  <li class="fragment">`make` can be run anywhere, from your laptop, a cron job, jenkins, and the next new thing.</li>
+  <li class="fragment">As a result, we can deploy _from_ anywhere, _to_ anywhere.</li>
+</ol>
 
-`make` can be run anywhere, from your laptop, a cron job, jenkins, and the next new thing.
-
-As a result, we can deploy _from_ anywhere, _to_ anywhere.
-
-
-```
-Finished: SUCCESS
-```
 
 ---
 

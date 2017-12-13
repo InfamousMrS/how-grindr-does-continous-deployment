@@ -26,26 +26,19 @@ It doesn't matter what build tool this is. It could be done just be a cron job.
 
 ### Why
 
-1. Keeps the deployment process working continuously without surprises.
-2. Deploy often with less overhead.
-3. Keeps deployments small. 
+1. Keeps the deployment process working continuously without surprises. <!-- .element: class="fragment" -->
+2. Deploy often with less overhead. <!-- .element: class="fragment" -->
+3. Keeps deployments small. <!-- .element: class="fragment" -->
 
 note:
 There are a lot of reasons, but I will focus on just a few. 
 
 ---
 
-Why does engineering stop after code is written? 
+Engineering doesn't stop when the code is written. 
 
+note: 
 Getting code to production is part of the job, and continuous deployment _just is_ the automation of deployment.
-
-
----
-
-### Composition
-
-
-By creating our continuous deployment out of small composable units, we get portability and independence of tasks.
 
 
 ---
@@ -64,6 +57,17 @@ We decided if we could deploy to anywhere and from anywhere, then everything els
 
 ---
 
+### Composition
+
+
+By creating our continuous deployment out of small composable units, we get portability and independence of tasks.
+
+note:
+Our guiding principle is composition.
+
+
+---
+
 ### Tasks
 
 1. Tests <!-- .element: class="fragment" -->
@@ -76,7 +80,6 @@ note:
 2. We also need to include tests that our deployment works.
 3. We need to build the thing being deployed
 4. We need to actually deploy it
-
 
 
 ---
@@ -103,7 +106,7 @@ target: source
     command
 
 hello_world:
-    echo "hello world" >> hello_world
+    echo "hello world" > hello_world
 
 cat_hello_world: hello_world 
     cat hello_world
@@ -813,32 +816,29 @@ Finished: SUCCESS
 ---
 
 
-How did we do it?
-
-We just composed it of the various tasks we need.
-
 We build continuous deployment by _not_ building continuous deployment.
+
+note:
+Continuous deployment is just the composed of tests and automated deployment.
 
 ---
 
 Don't be intimidated!
 
-There is a lot here, but we figured it all out just by building what we needed piece by piece. 
-
-You, too, can build your own continuous delivery pipeline, 
-and some may be borrowed from what you saw today, and other parts will be different to suit your needs.
-
-Don't wait for someone else to build it or it will never happen. Nobody else can build what _you_ need.
+note: 
+1. There is a lot here, but we figured it all out just by building what we needed piece by piece. 
+2. You can build your own for your needs.
+3. Don't wait for someone else to build it; they won't.
 
 ---
 
 Thanks to the great engineers that contributed.
 
-Nicolas Mosconi
-Robert Tibljas
-Valentin Traverso
-Justin Standard
-Rafal Studnicki
-Simon Zelazny
+- Nicolas Mosconi
+- Robert Tibljas
+- Valentin Traverso
+- Justin Standard
+- Rafal Studnicki
+- Simon Zelazny
 
 
